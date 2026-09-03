@@ -1,0 +1,13 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro'
+import LabTools from '../components/LabTools'
+---
+
+<BaseLayout title="实验室 — UPINKING" description="四个本地优先的小工具：待办、计时、颜色换算与快速笔记。">
+  <div class="page-frame">
+    <p class="eyebrow">Blueprint instruments / v1.0</p>
+    <h1 class="display-title">实验室</h1>
+    <p class="page-intro">把日常需要的微型工具收拢成一组安静的仪器。所有内容只保存在你的浏览器，本页不会上传数据。</p>
+    <LabTools client:load />
+  </div>
+</BaseLayout>

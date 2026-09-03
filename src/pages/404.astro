@@ -1,0 +1,23 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro'
+---
+<BaseLayout title="页面未找到 — UPINKING" description="你访问的坐标不存在。">
+  <section class="not-found">
+    <div class="target" aria-hidden="true"><span></span><strong>404</strong></div>
+    <p class="eyebrow">Coordinate not found</p>
+    <h1>这条路径<br />没有观测结果。</h1>
+    <p>可能是链接已经移动，或地址输入有误。</p>
+    <a class="link-arrow" href="/">回到首页</a>
+  </section>
+</BaseLayout>
+<style>
+  .not-found { min-height: calc(100vh - 80px); padding: 80px 8vw; display: flex; flex-direction: column; align-items: flex-start; justify-content: center; background-image: linear-gradient(rgba(63,140,255,.045) 1px, transparent 1px), linear-gradient(90deg, rgba(63,140,255,.045) 1px, transparent 1px); background-size: 34px 34px; }
+  .target { position: absolute; right: 12vw; width: 270px; aspect-ratio: 1; border: 1px solid rgba(63,140,255,.3); border-radius: 50%; display: grid; place-items: center; }
+  .target::before, .target::after { content: ''; position: absolute; background: rgba(63,140,255,.3); }
+  .target::before { width: 130%; height: 1px; } .target::after { width: 1px; height: 130%; }
+  .target strong { color: rgba(80,151,255,.22); font-size: 80px; }
+  .not-found h1 { margin: 20px 0; font-family: var(--serif); font-size: clamp(47px, 7vw, 92px); line-height: 1.15; }
+  .not-found > p:not(.eyebrow) { color: #8c9bad; }
+  .not-found .link-arrow { margin-top: 25px; }
+  @media(max-width: 760px) { .target { position: relative; right: auto; width: 150px; margin-bottom: 50px; } .target strong { font-size: 45px; } }
+</style>

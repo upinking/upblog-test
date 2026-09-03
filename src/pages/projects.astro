@@ -1,0 +1,54 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro'
+import ProjectGrid from '../components/ProjectGrid'
+import ProjectHeroMotion from '../components/ProjectHeroMotion'
+import { projectSnapshot } from '../data/projects'
+import blueprint from '../assets/project-blueprint.png'
+---
+
+<BaseLayout title="项目 — UPINKING" description="UPINKING 正在构建的开源软件与实验。">
+  <header class="projects-hero">
+    <img src={blueprint.src} alt="抽象的工程蓝图空间" />
+    <div class="project-motion-layer" aria-hidden="true"><ProjectHeroMotion client:load /></div>
+    <div class="projects-shade"></div>
+    <div class="page-frame projects-head-copy">
+      <div class="eyebrow">Selected projects / 03</div>
+      <h1 class="display-title">构建中的<br />实验</h1>
+      <p class="page-intro">写作工具、桌面效率软件与持续迭代的个人网站。项目不是结果陈列，而是问题如何被拆解的记录。</p>
+    </div>
+  </header>
+  <section class="page-frame projects-list">
+    <ProjectGrid fallback={projectSnapshot} client:load />
+  </section>
+</BaseLayout>
+
+<style is:global>
+  .projects-hero { --project-x: 0px; --project-y: 0px; --project-scroll: 0; position: relative; min-height: 570px; overflow: hidden; perspective: 1100px; }
+  .projects-hero > img { position: absolute; z-index: 0; inset: -20px; width: calc(100% + 40px); height: calc(100% + 40px); object-fit: cover; transform: translate3d(calc(var(--project-x) * -.42), calc(var(--project-y) * -.42 + var(--project-scroll) * 22px), -20px) scale(calc(1.045 - var(--project-scroll) * .02)); }
+  .project-motion-layer { position: absolute; z-index: 1; inset: 0; overflow: hidden; pointer-events: none; transform: translate3d(calc(var(--project-x) * .3), calc(var(--project-y) * .3), 36px); }
+  .project-motion-layer astro-island { display: block; width: 100%; height: 100%; }
+  .project-field-canvas { position: absolute; inset: 0; width: 100%; height: 100%; opacity: calc(.88 - var(--project-scroll) * .35); pointer-events: none; }
+  .projects-shade { position: absolute; z-index: 2; inset: 0; background: linear-gradient(90deg, rgba(7,13,20,.98), rgba(7,13,20,.5) 58%, rgba(7,13,20,.12)), linear-gradient(0deg, var(--ink), transparent 40%); }
+  .projects-head-copy { position: relative; z-index: 3; padding-top: 112px; transform: translate3d(calc(var(--project-x) * .1), calc(var(--project-y) * .1 + var(--project-scroll) * 30px), 54px); opacity: calc(1 - var(--project-scroll) * .38); }
+  .projects-list { padding-top: 60px; }
+  .project-source { display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; color: #8c9aab; font-size: 12px; animation: project-row-enter .52s cubic-bezier(.16,.76,.18,1) both; }
+  .project-source > a { display: flex; align-items: center; gap: 7px; color: var(--blue-soft); }
+  .project-grid { border-top: 1px solid var(--line); }
+  .project-card { display: grid; grid-template-columns: 80px 120px 1fr 1.2fr 180px; gap: 24px; align-items: center; min-height: 180px; border-bottom: 1px solid var(--line); transition: background .25s ease, padding .35s cubic-bezier(.16,.76,.18,1); }
+  .project-card:hover { padding-inline: 12px; background: rgba(62,139,255,.035); }
+  .project-card { animation: project-row-enter .68s cubic-bezier(.16,.76,.18,1) both; }
+  .project-card:nth-child(2) { animation-delay: .07s; }
+  .project-card:nth-child(3) { animation-delay: .14s; }
+  @keyframes project-row-enter { from { opacity: 0; transform: translateY(22px); filter: blur(3px); } to { opacity: 1; transform: none; filter: none; } }
+  @media (max-width: 760px) { .project-motion-layer { display: none; } .projects-hero > img, .projects-head-copy { transform: none !important; opacity: 1 !important; } }
+  @media (prefers-reduced-motion: reduce) { .project-field-canvas { display: none; } .projects-hero > img, .projects-head-copy { transform: none !important; opacity: 1 !important; } }
+  .project-number { color: var(--orange); font-family: var(--serif); font-size: 24px; text-align: center; }
+  .project-language { color: var(--blue-soft); font-size: 11px; }
+  .project-card h2 { font-family: var(--serif); font-size: 27px; }
+  .project-card p { color: #9ba8b7; line-height: 1.8; }
+  .project-foot { display: grid; grid-template-columns: repeat(3, auto); gap: 14px; align-items: center; color: #778699; font-size: 11px; }
+  .project-foot span { display: inline-flex; align-items: center; gap: 5px; }
+  .project-foot a { color: var(--blue); }
+  @media (max-width: 980px) { .project-card { grid-template-columns: 54px 1fr 120px; padding: 28px 0; } .project-language { grid-column: 2; } .project-card h2 { grid-column: 2; margin: 0; } .project-card p { grid-column: 2 / 4; margin: 0; } .project-foot { grid-column: 3; grid-row: 1 / 3; } }
+  @media (max-width: 620px) { .projects-hero { min-height: 500px; } .project-card { grid-template-columns: 42px 1fr; } .project-card p, .project-foot { grid-column: 2; grid-row: auto; } .project-foot { display: flex; } }
+</style>

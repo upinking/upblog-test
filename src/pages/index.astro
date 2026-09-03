@@ -1,0 +1,67 @@
+---
+import { getCollection } from 'astro:content'
+import BaseLayout from '../layouts/BaseLayout.astro'
+import HeroDepth from '../components/HeroDepth'
+import heroImage from '../assets/hero-field-map-v2.png'
+import projectImage from '../assets/project-blueprint.png'
+import { formatDate, readingTime, sortPosts } from '../lib/posts'
+import '../styles/home.css'
+
+const posts = sortPosts(await getCollection('posts', ({ data }) => !data.draft))
+const featured = posts.find((post) => post.data.featured) || posts[0]
+const notes = posts.filter((post) => post.id !== featured.id).slice(0, 3).map((post) => ({
+  title: post.data.title,
+  description: post.data.description,
+  date: formatDate(post.data.publishedAt),
+  href: `/articles/${post.id}`,
+}))
+---
+
+<BaseLayout>
+  <HeroDepth image={heroImage.src} notes={notes} client:load />
+
+  <section class="featured-paper paper" aria-labelledby="featured-title" data-reveal>
+    <div class="featured-no">01<small>FEATURED ESSAY</small></div>
+    <div class="featured-main">
+      <div class="meta">{featured.data.category} × 思维</div>
+      <h2 id="featured-title">{featured.data.title}</h2>
+      <p>{featured.data.description}</p>
+    </div>
+    <div class="featured-side">
+      <p>从一个核心问题出发，穿过原理、工程与实践，把复杂主题拆成可以继续探索的路径。</p>
+      <a href={`/articles/${featured.id}`}>阅读文章 · {readingTime(featured.body)} 分钟 →</a>
+    </div>
+  </section>
+
+  <section class="projects-teaser" aria-labelledby="projects-title" data-reveal>
+    <img src={projectImage.src} alt="抽象的软件工程蓝图空间" loading="lazy" />
+    <div class="projects-teaser-content">
+      <div class="eyebrow">Selected projects</div>
+      <h2 id="projects-title">一些正在构建的实验</h2>
+      <p>从 Markdown 写作工具到划词翻译应用，用真实项目记录想法怎样变成可用的软件。</p>
+      <a class="link-arrow" href="/projects">查看项目</a>
+    </div>
+  </section>
+</BaseLayout>
+
+<script>
+  let homeObserver: IntersectionObserver | undefined
+  const initHomeReveal = () => {
+    homeObserver?.disconnect()
+    const sections = document.querySelectorAll<HTMLElement>('[data-reveal]')
+    if (matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      sections.forEach((section) => { section.dataset.visible = 'true' })
+      return
+    }
+    homeObserver = new IntersectionObserver((entries) => {
+      entries.forEach((entry) => {
+        if (!entry.isIntersecting) return
+        ;(entry.target as HTMLElement).dataset.visible = 'true'
+        homeObserver?.unobserve(entry.target)
+      })
+    }, { threshold: .16 })
+    sections.forEach((section) => homeObserver?.observe(section))
+  }
+  document.addEventListener('astro:page-load', initHomeReveal)
+  initHomeReveal()
+</script>

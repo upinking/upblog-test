@@ -1,0 +1,61 @@
+---
+import { ArrowUpRightIcon, CodeIcon, CompassIcon, WaveformIcon } from '@phosphor-icons/react'
+import BaseLayout from '../layouts/BaseLayout.astro'
+---
+
+<BaseLayout title="关于 — UPINKING" description="关于 UPINKING：前端工程、软件工具、物理与设计。">
+  <div class="about-hero">
+    <div class="page-frame about-grid">
+      <div>
+        <p class="eyebrow">About / field profile</p>
+        <h1 class="display-title">保持好奇，<br />持续构建。</h1>
+      </div>
+      <div class="about-statement">
+        <span class="orange-rule"></span>
+        <p>UPINKING 是我在互联网上使用的名字。这里记录工程判断形成的过程：从前端渲染与类型系统，到独立软件、交互设计与物理世界。</p>
+        <p>我相信好的技术写作不只给出答案，还应保留问题的边界、测量的方法与失败的路径。</p>
+      </div>
+    </div>
+  </div>
+
+  <section class="paper focus-section">
+    <div class="focus-grid">
+      <article><CodeIcon size={29}/><span>01 / ENGINEERING</span><h2>前端工程</h2><p>React、TypeScript、性能与可维护的 CSS。关注浏览器真正执行了什么。</p></article>
+      <article><WaveformIcon size={29}/><span>02 / PHYSICS</span><h2>物理直觉</h2><p>从方程的结构出发理解现象，也借科学图解寻找更清楚的表达方式。</p></article>
+      <article><CompassIcon size={29}/><span>03 / TOOLS</span><h2>独立工具</h2><p>构建能解决具体问题的小型软件，让复杂能力落进简单、可靠的工作流。</p></article>
+    </div>
+  </section>
+
+  <section class="about-projects page-frame">
+    <p class="eyebrow">Open source coordinates</p>
+    <h2 class="section-title">正在公开构建</h2>
+    <div class="project-links">
+      <a href="https://github.com/upinking/MarkNote" target="_blank" rel="noreferrer"><span>Markdown 笔记工具</span><strong>MarkNote</strong><ArrowUpRightIcon/></a>
+      <a href="https://github.com/upinking/STranslate-lite" target="_blank" rel="noreferrer"><span>Windows 划词翻译</span><strong>STranslate-lite</strong><ArrowUpRightIcon/></a>
+      <a href="https://github.com/upinking" target="_blank" rel="noreferrer"><span>全部公开仓库</span><strong>GitHub / upinking</strong><ArrowUpRightIcon/></a>
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  .about-hero { min-height: 620px; display: flex; align-items: center; background: radial-gradient(circle at 73% 48%, rgba(40,107,190,.17), transparent 32%), linear-gradient(rgba(75,126,188,.045) 1px, transparent 1px), linear-gradient(90deg, rgba(75,126,188,.045) 1px, transparent 1px); background-size: auto, 42px 42px, 42px 42px; }
+  .about-grid { width: min(1180px, calc(100% - 72px)); padding: 72px 0; display: grid; grid-template-columns: 1.2fr .8fr; align-items: end; gap: 80px; }
+  .about-statement { max-width: 500px; padding-bottom: 13px; color: #b1bdca; font: 500 16px/2 var(--serif); }
+  .orange-rule { width: 60px; height: 3px; margin-bottom: 28px; background: var(--orange); display: block; }
+  .focus-section { padding: 90px 6vw; }
+  .focus-grid { width: min(1080px, 100%); margin: auto; display: grid; grid-template-columns: repeat(3, 1fr); }
+  .focus-grid article { min-height: 310px; padding: 40px 42px; border-left: 1px solid #c6c0b3; }
+  .focus-grid article:last-child { border-right: 1px solid #c6c0b3; }
+  .focus-grid svg { color: #1c5cb6; }
+  .focus-grid span { margin-top: 54px; color: #6f7780; font-size: 9px; letter-spacing: .14em; display: block; }
+  .focus-grid h2 { margin: 12px 0 17px; font-family: var(--serif); font-size: 26px; }
+  .focus-grid p { color: #565d63; font-family: var(--serif); line-height: 1.9; }
+  .about-projects { padding-top: 100px; }
+  .project-links { margin-top: 45px; border-top: 1px solid var(--line); }
+  .project-links a { min-height: 112px; padding: 22px 8px; border-bottom: 1px solid var(--line); display: grid; grid-template-columns: 1fr 1.4fr 32px; align-items: center; transition: background .2s ease, padding .2s ease; }
+  .project-links a:hover { padding-inline: 22px; background: rgba(63,140,255,.05); }
+  .project-links span { color: #718196; font-size: 11px; }
+  .project-links strong { font-family: var(--serif); font-size: clamp(21px, 3vw, 31px); }
+  .project-links svg { color: var(--orange); }
+  @media (max-width: 760px) { .about-grid { width: calc(100% - 36px); grid-template-columns: 1fr; gap: 30px; } .focus-grid { grid-template-columns: 1fr; } .focus-grid article, .focus-grid article:last-child { min-height: auto; border: 0; border-top: 1px solid #c6c0b3; } .project-links a { grid-template-columns: 1fr 28px; } .project-links a span { grid-column: 1; } .project-links strong { grid-column: 1; } .project-links svg { grid-column: 2; grid-row: 1 / 3; } }
+</style>

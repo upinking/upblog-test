@@ -1,0 +1,158 @@
+---
+import { getCollection, render } from 'astro:content'
+import BaseLayout from '../../layouts/BaseLayout.astro'
+import { formatDate, readingTime, sortPosts } from '../../lib/posts'
+
+export async function getStaticPaths() {
+  const posts = await getCollection('posts', ({ data }) => !data.draft)
+  return posts.map((post) => ({ params: { slug: post.id }, props: { post, posts } }))
+}
+
+const { post, posts } = Astro.props
+const ordered = sortPosts(posts)
+const currentIndex = ordered.findIndex((item) => item.id === post.id)
+const previous = ordered[currentIndex + 1]
+const next = ordered[currentIndex - 1]
+const related = ordered.filter((item) => item.id !== post.id && item.data.category === post.data.category).slice(0, 2)
+const { Content, headings } = await render(post)
+const toc = headings.filter((heading) => heading.depth === 2 || heading.depth === 3)
+---
+
+<BaseLayout title={`${post.data.title} — UPINKING`} description={post.data.description} image={post.data.cover} type="article">
+  <div class="reading-progress" id="reading-progress" aria-hidden="true"></div>
+  <article class="article-page">
+    <header class="article-hero">
+      <img src={post.data.cover} alt="" />
+      <div class="article-hero-shade"></div>
+      <div class="article-hero-copy">
+        <a href="/articles" class="back">← 返回文章</a>
+        <div class="article-kicker">{post.data.category} / FIELD NOTE</div>
+        <h1>{post.data.title}</h1>
+        <p>{post.data.description}</p>
+        <div class="article-info">
+          <time datetime={post.data.publishedAt.toISOString()}>{formatDate(post.data.publishedAt)}</time>
+          <span>{readingTime(post.body)} 分钟阅读</span>
+          <span>更新于 {formatDate(post.data.updatedAt)}</span>
+        </div>
+      </div>
+    </header>
+
+    <div class="article-layout paper">
+      <aside class="toc" aria-label="文章目录">
+        <div class="toc-title">ON THIS PAGE</div>
+        <nav>
+          {toc.map((heading) => <a class:list={{ sub: heading.depth === 3 }} href={`#${heading.slug}`}>{heading.text}</a>)}
+        </nav>
+      </aside>
+      <div class="prose" id="article-content">
+        <Content />
+      </div>
+    </div>
+
+    <footer class="article-footer">
+      <div class="article-nav">
+        {previous ? <a href={`/articles/${previous.id}`}><small>上一篇</small><strong>{previous.data.title}</strong></a> : <span></span>}
+        {next ? <a class="next" href={`/articles/${next.id}`}><small>下一篇</small><strong>{next.data.title}</strong></a> : <span></span>}
+      </div>
+      {related.length > 0 && <div class="related"><span>继续阅读</span>{related.map((item) => <a href={`/articles/${item.id}`}>{item.data.title} →</a>)}</div>}
+    </footer>
+  </article>
+</BaseLayout>
+
+<script>
+  let cleanupArticle: (() => void) | undefined
+
+  const initArticleEnhancements = () => {
+    cleanupArticle?.()
+    const progress = document.querySelector<HTMLElement>('#reading-progress')
+    const article = document.querySelector<HTMLElement>('#article-content')
+    if (!progress || !article) return
+    const updateProgress = () => {
+      const start = article.offsetTop
+      const distance = article.offsetHeight - innerHeight
+      const value = Math.max(0, Math.min(1, (scrollY - start + 120) / Math.max(distance, 1)))
+      progress.style.transform = `scaleX(${value})`
+    }
+    addEventListener('scroll', updateProgress, { passive: true })
+    updateProgress()
+
+    document.querySelectorAll('#article-content pre').forEach((pre) => {
+      if (pre.querySelector('.copy-code')) return
+      const button = document.createElement('button')
+      button.className = 'copy-code'
+      button.type = 'button'
+      button.textContent = '复制'
+      button.addEventListener('click', async () => {
+        try {
+          await navigator.clipboard.writeText(pre.textContent || '')
+          button.textContent = '已复制'
+        } catch {
+          button.textContent = '复制失败'
+        }
+        setTimeout(() => { button.textContent = '复制' }, 1600)
+      })
+      pre.append(button)
+    })
+
+    const tocLinks = [...document.querySelectorAll<HTMLAnchorElement>('.toc a')]
+    const sections = tocLinks.map((link) => document.getElementById(decodeURIComponent(link.hash.slice(1)))).filter(Boolean)
+    const observer = new IntersectionObserver((entries) => {
+      const visible = entries.find((entry) => entry.isIntersecting)
+      if (!visible) return
+      tocLinks.forEach((link) => link.toggleAttribute('aria-current', decodeURIComponent(link.hash.slice(1)) === visible.target.id))
+    }, { rootMargin: '-20% 0px -65%' })
+    sections.forEach((section) => observer.observe(section!))
+    cleanupArticle = () => {
+      removeEventListener('scroll', updateProgress)
+      observer.disconnect()
+    }
+  }
+
+  document.addEventListener('astro:page-load', initArticleEnhancements)
+  document.addEventListener('astro:before-swap', () => cleanupArticle?.())
+  initArticleEnhancements()
+</script>
+
+<style is:global>
+  .reading-progress { position: fixed; z-index: 80; inset: 0 0 auto 112px; height: 3px; transform: scaleX(0); transform-origin: left; background: var(--orange); }
+  .article-hero { position: relative; min-height: 540px; overflow: hidden; display: flex; align-items: end; }
+  .article-hero > img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+  .article-hero-shade { position: absolute; inset: 0; background: linear-gradient(90deg, rgba(7,13,20,.98) 0%, rgba(7,13,20,.78) 52%, rgba(7,13,20,.2)), linear-gradient(0deg, rgba(7,13,20,.85), transparent 70%); }
+  .article-hero-copy { position: relative; z-index: 1; width: min(980px, calc(100% - 80px)); margin: 0 auto; padding: 72px 0 64px; }
+  .back { display: inline-block; margin-bottom: 50px; color: #a9b5c3; font-size: 12px; }
+  .article-kicker { color: var(--orange); font-size: 11px; letter-spacing: .14em; }
+  .article-hero h1 { max-width: 900px; margin: 16px 0 18px; font-family: var(--serif); font-size: clamp(40px, 5.5vw, 78px); line-height: 1.22; letter-spacing: -.04em; }
+  .article-hero-copy > p { max-width: 700px; color: #bdc6d1; font-family: var(--serif); line-height: 1.8; }
+  .article-info { display: flex; flex-wrap: wrap; gap: 18px; margin-top: 28px; color: #8997a7; font-size: 11px; }
+  .article-layout { display: grid; grid-template-columns: 220px minmax(0, 760px); justify-content: center; gap: 64px; padding: 78px 54px 110px; }
+  .toc { position: sticky; top: 36px; align-self: start; max-height: calc(100vh - 72px); overflow: auto; }
+  .toc-title { margin-bottom: 20px; color: #2c5caa; font-size: 10px; letter-spacing: .15em; }
+  .toc nav { display: grid; border-left: 1px solid #c4c0b6; }
+  .toc a { padding: 7px 0 7px 16px; color: #73787d; font-size: 11px; line-height: 1.5; }
+  .toc a.sub { padding-left: 28px; font-size: 10px; }
+  .toc a[aria-current] { color: #174da8; border-left: 2px solid #174da8; margin-left: -1px; }
+  .prose { min-width: 0; color: #20262c; font-family: var(--serif); font-size: 17px; line-height: 2; }
+  .prose > :first-child { margin-top: 0; }
+  .prose h2 { margin: 2.2em 0 .8em; font-size: 30px; line-height: 1.45; scroll-margin-top: 30px; }
+  .prose h3 { margin: 1.8em 0 .65em; font-size: 22px; scroll-margin-top: 30px; }
+  .prose p, .prose li { color: #33393f; }
+  .prose a { color: #174fae; text-decoration: underline; text-underline-offset: 4px; }
+  .prose blockquote { margin: 2em 0; padding: 2px 0 2px 24px; border-left: 3px solid #2f65bd; color: #47525d; }
+  .prose :not(pre) > code { padding: .15em .38em; color: #9c4310; background: #ded8ca; font-family: var(--sans); font-size: .88em; }
+  .prose pre { position: relative; margin: 2em 0; padding: 26px; overflow: auto; border: 1px solid #24394f; background: #09121d !important; font-family: var(--sans); font-size: 13px; line-height: 1.75; }
+  .copy-code { position: absolute; top: 10px; right: 10px; padding: 6px 9px; border: 1px solid #38516b; color: #a9bdd3; background: #111e2c; cursor: pointer; font-size: 10px; }
+  .prose table { width: 100%; border-collapse: collapse; font-family: var(--sans); font-size: 13px; }
+  .prose th, .prose td { padding: 10px; border-bottom: 1px solid #c9c4b8; text-align: left; }
+  .prose img { margin: 2em 0; }
+  .article-footer { width: min(980px, calc(100% - 72px)); margin: 0 auto; padding: 64px 0 96px; }
+  .article-nav { display: grid; grid-template-columns: 1fr 1fr; gap: 30px; }
+  .article-nav a { display: grid; gap: 8px; padding: 22px 0; border-top: 1px solid var(--line); }
+  .article-nav a.next { text-align: right; }
+  .article-nav small { color: #718196; }
+  .article-nav strong { font-family: var(--serif); font-size: 20px; }
+  .related { display: flex; gap: 24px; margin-top: 34px; color: #8190a1; font-size: 12px; }
+  .related a { color: var(--blue-soft); }
+  .katex-display { overflow-x: auto; padding: 12px 0; }
+  @media (max-width: 900px) { .reading-progress { left: 0; top: 64px; } }
+  @media (max-width: 760px) { .article-hero { min-height: 520px; } .article-hero-copy { width: calc(100% - 40px); } .article-layout { display: block; padding: 48px 22px 76px; } .toc { display: none; } .prose { font-size: 16px; line-height: 1.9; } .article-footer { width: calc(100% - 40px); } .article-nav { grid-template-columns: 1fr; } .article-nav a.next { text-align: left; } .related { flex-direction: column; } }
+</style>

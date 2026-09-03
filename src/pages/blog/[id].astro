@@ -1,0 +1,16 @@
+---
+export function getStaticPaths() {
+  const legacy = {
+    '1': 'react-concurrent-rendering',
+    '2': 'modern-css-motion',
+    '3': 'typescript-type-system',
+    '4': 'node-performance',
+    '5': 'tailwind-system',
+    '6': 'vue-composition-api',
+    '7': 'maxwell-equations',
+  }
+  return Object.entries(legacy).map(([id, target]) => ({ params: { id }, props: { target } }))
+}
+
+return Astro.redirect(`/articles/${Astro.props.target}`, 301)
+---

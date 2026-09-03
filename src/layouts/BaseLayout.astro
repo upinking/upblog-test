@@ -1,0 +1,122 @@
+---
+import '../styles/global.css'
+import 'katex/dist/katex.min.css'
+import { ClientRouter } from 'astro:transitions'
+
+interface Props {
+  title?: string
+  description?: string
+  image?: string
+  type?: 'website' | 'article'
+}
+
+const {
+  title = 'UPINKING — 构建、拆解、记录',
+  description = 'UPINKING 的技术博客：前端工程、软件工具、物理与设计。',
+  image = '/assets/og-cover.webp',
+  type = 'website',
+} = Astro.props
+const canonical = new URL(Astro.url.pathname, Astro.site)
+const nav = [
+  ['01', '首页', '/'],
+  ['02', '文章', '/articles'],
+  ['03', '项目', '/projects'],
+  ['04', '实验室', '/lab'],
+  ['05', '关于', '/about'],
+]
+const current = Astro.url.pathname
+const isCurrent = (href: string) => href === '/' ? current === '/' : current.startsWith(href)
+---
+
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#070d14" />
+    <meta name="description" content={description} />
+    <link rel="canonical" href={canonical} />
+    <link rel="alternate" type="application/rss+xml" title="UPINKING RSS" href="/rss.xml" />
+    <meta property="og:type" content={type} />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:url" content={canonical} />
+    <meta property="og:image" content={new URL(image, Astro.site)} />
+    <meta name="twitter:card" content="summary_large_image" />
+    <ClientRouter fallback="animate" />
+    <title>{title}</title>
+  </head>
+  <body>
+    <div class="shell">
+      <aside class="site-rail" aria-label="主导航">
+        <div class="signal-dot" aria-hidden="true"></div>
+        <a class="brand-vertical" href="/" aria-label="UPINKING 首页">UPINKING</a>
+        <nav class="rail-nav">
+          {nav.map(([index, label, href]) => (
+            <a href={href} aria-current={isCurrent(href) ? 'page' : undefined}><span>{index}</span>{label}</a>
+          ))}
+        </nav>
+        <div class="rail-motto">Code.<br />Design.<br />Curiosity.</div>
+      </aside>
+      <header class="mobile-header">
+        <a class="mobile-brand" href="/">UPINKING</a>
+        <nav class="mobile-nav" aria-label="移动导航">
+          {nav.slice(1).map(([, label, href]) => <a href={href}>{label}</a>)}
+        </nav>
+      </header>
+      <main class="page" transition:name="page-content"><slot /></main>
+      <footer class="site-footer">
+        <span>© {new Date().getFullYear()} UPINKING</span>
+        <span>Built with Astro · 以清晰对抗复杂</span>
+      </footer>
+    </div>
+  </body>
+</html>
+
+<script>
+  let revealObserver: IntersectionObserver | undefined
+
+  const preparePageMotion = () => {
+    revealObserver?.disconnect()
+    const targets = [...document.querySelectorAll<HTMLElement>([
+      '.articles-head > *',
+      '.article-controls',
+      '.article-count',
+      '.article-row',
+      '.projects-head-copy > *',
+      '.page-frame > .eyebrow',
+      '.page-frame > .display-title',
+      '.page-frame > .page-intro',
+      '.about-grid > *',
+      '.focus-grid > article',
+      '.about-projects > *',
+      '.article-hero-copy > *',
+      '.article-layout',
+      '.article-footer',
+      '.not-found > *',
+    ].join(','))]
+
+    targets.forEach((target, index) => {
+      target.dataset.motion = 'ready'
+      target.style.setProperty('--motion-order', String(Math.min(index % 8, 6)))
+    })
+
+    if (matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      targets.forEach((target) => { target.dataset.motionVisible = 'true' })
+      return
+    }
+
+    revealObserver = new IntersectionObserver((entries) => {
+      entries.forEach((entry) => {
+        if (!entry.isIntersecting) return
+        const target = entry.target as HTMLElement
+        target.dataset.motionVisible = 'true'
+        revealObserver?.unobserve(target)
+      })
+    }, { threshold: .08, rootMargin: '0px 0px -7% 0px' })
+    targets.forEach((target) => revealObserver?.observe(target))
+  }
+
+  document.addEventListener('astro:page-load', preparePageMotion)
+  preparePageMotion()
+</script>

@@ -1,0 +1,104 @@
+---
+import { getCollection } from 'astro:content'
+import BaseLayout from '../../layouts/BaseLayout.astro'
+import { categoryList, formatDate, readingTime, sortPosts } from '../../lib/posts'
+
+const posts = sortPosts(await getCollection('posts', ({ data }) => !data.draft))
+const categories = categoryList(posts)
+---
+
+<BaseLayout title="文章 — UPINKING" description="关于前端工程、类型系统、软件性能与物理的深度文章。">
+  <div class="page-frame articles-page">
+    <header class="articles-head">
+      <div>
+        <div class="eyebrow">Field notes / 02</div>
+        <h1 class="display-title">文章</h1>
+        <p class="page-intro">把复杂的问题拆开，再用清晰的文字重新组装。这里记录工程实践，也保留对物理与设计的长期好奇。</p>
+      </div>
+      <div class="issue">ISSUE<br /><strong>07</strong></div>
+    </header>
+
+    <section class="article-controls" aria-label="筛选文章">
+      <label class="search"><span>SEARCH</span><input id="article-search" type="search" placeholder="搜索标题、标签或主题" autocomplete="off" /></label>
+      <div class="categories" role="group" aria-label="文章分类">
+        {categories.map((category, index) => <button class="category" data-category={category} aria-pressed={index === 0 ? 'true' : 'false'}>{category}</button>)}
+      </div>
+    </section>
+
+    <p id="article-count" class="article-count">共 {posts.length} 篇记录</p>
+    <div class="article-list" id="article-list">
+      {posts.map((post, index) => (
+        <article class="article-row" data-search={[post.data.title, post.data.description, post.data.category, ...post.data.tags].join(' ').toLowerCase()} data-category={post.data.category}>
+          <span class="article-index">{String(index + 1).padStart(2, '0')}</span>
+          <div class="article-copy">
+            <div class="article-meta"><span>{post.data.category}</span><time>{formatDate(post.data.publishedAt)}</time><span>{readingTime(post.body)} 分钟</span></div>
+            <h2><a href={`/articles/${post.id}`}>{post.data.title}</a></h2>
+            <p>{post.data.description}</p>
+            <div class="tags">{post.data.tags.map((tag) => <span>#{tag}</span>)}</div>
+          </div>
+          <a class="row-arrow" href={`/articles/${post.id}`} aria-label={`阅读《${post.data.title}》`}>↗</a>
+        </article>
+      ))}
+    </div>
+    <div class="empty" id="article-empty" hidden>没有找到匹配的文章，换个关键词试试。</div>
+  </div>
+</BaseLayout>
+
+<script>
+  const initArticleFilters = () => {
+    const search = document.querySelector<HTMLInputElement>('#article-search')
+    if (!search || search.dataset.enhanced === 'true') return
+    search.dataset.enhanced = 'true'
+    const buttons = [...document.querySelectorAll<HTMLButtonElement>('.category')]
+    const rows = [...document.querySelectorAll<HTMLElement>('.article-row')]
+    const count = document.querySelector<HTMLElement>('#article-count')
+    const empty = document.querySelector<HTMLElement>('#article-empty')
+    let activeCategory = '全部'
+    const update = () => {
+      const query = search.value.trim().toLocaleLowerCase('zh-CN')
+      let visible = 0
+      rows.forEach((row) => {
+        const matches = (activeCategory === '全部' || row.dataset.category === activeCategory) && (!query || row.dataset.search?.includes(query))
+        row.hidden = !matches
+        if (matches) visible++
+      })
+      if (count) count.textContent = `找到 ${visible} 篇记录`
+      if (empty) empty.hidden = visible > 0
+    }
+    search.addEventListener('input', update)
+    buttons.forEach((button) => button.addEventListener('click', () => {
+      activeCategory = button.dataset.category || '全部'
+      buttons.forEach((item) => item.setAttribute('aria-pressed', String(item === button)))
+      update()
+    }))
+  }
+  document.addEventListener('astro:page-load', initArticleFilters)
+  initArticleFilters()
+</script>
+
+<style>
+  .articles-head { display: flex; justify-content: space-between; gap: 36px; align-items: end; padding-bottom: 56px; border-bottom: 1px solid var(--line); }
+  .issue { color: #65758a; font-size: 10px; letter-spacing: .16em; text-align: right; }
+  .issue strong { color: var(--blue); font-family: var(--serif); font-size: 88px; font-weight: 500; line-height: .9; }
+  .article-controls { display: grid; grid-template-columns: minmax(260px, .8fr) 1.2fr; gap: 36px; padding: 30px 0; border-bottom: 1px solid var(--line); }
+  .search { display: grid; grid-template-columns: auto 1fr; gap: 16px; align-items: center; color: #718195; font-size: 10px; letter-spacing: .14em; }
+  .search input { width: 100%; padding: 11px 0; border: 0; border-bottom: 1px solid #35475a; color: #fff; background: transparent; outline: 0; }
+  .search input:focus { border-color: var(--orange); }
+  .categories { display: flex; justify-content: flex-end; gap: 8px; flex-wrap: wrap; }
+  .category { padding: 9px 13px; border: 1px solid #2b3b4e; color: #9dabb9; background: transparent; cursor: pointer; }
+  .category[aria-pressed='true'] { border-color: var(--orange); color: #fff; background: rgba(255,138,31,.08); }
+  .article-count { margin: 28px 0 10px; color: #69798d; font-size: 11px; }
+  .article-row { position: relative; display: grid; grid-template-columns: 70px 1fr 48px; gap: 24px; padding: 34px 0; border-bottom: 1px solid var(--line); }
+  .article-row[hidden] { display: none; }
+  .article-index { color: var(--blue); font-family: var(--serif); font-size: 23px; }
+  .article-meta { display: flex; gap: 16px; color: #738397; font-size: 10px; }
+  .article-meta span:first-child { color: var(--orange); }
+  .article-copy h2 { margin: 11px 0 10px; font-family: var(--serif); font-size: clamp(23px, 2.6vw, 36px); line-height: 1.35; }
+  .article-copy h2 a:hover { color: var(--blue-soft); }
+  .article-copy p { margin: 0; max-width: 720px; color: #9ba8b7; line-height: 1.8; }
+  .tags { display: flex; gap: 12px; margin-top: 16px; color: #6684a7; font-size: 10px; }
+  .row-arrow { align-self: center; color: var(--blue); font-size: 28px; transition: transform .2s ease, color .2s ease; }
+  .row-arrow:hover { color: var(--orange); transform: translate(3px,-3px); }
+  .empty { padding: 80px 0; color: #8190a1; text-align: center; }
+  @media (max-width: 720px) { .issue { display: none; } .article-controls { grid-template-columns: 1fr; gap: 24px; } .categories { justify-content: flex-start; } .article-row { grid-template-columns: 40px 1fr; gap: 12px; } .row-arrow { display: none; } }
+</style>
