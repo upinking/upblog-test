@@ -12,7 +12,7 @@ interface Props {
 
 const {
   title = 'UPINKING — 构建、拆解、记录',
-  description = 'UPINKING 的技术博客：嵌入式系统、软件工具、物理与设计。',
+  description = 'UPINKING 的学习与实践记录：一名大学生的嵌入式探索、软件项目、物理与设计。',
   image = '/assets/og-cover.webp',
   type = 'website',
 } = Astro.props
@@ -61,7 +61,7 @@ const isCurrent = (href: string) => href === '/' ? current === '/' : current.sta
       <header class="mobile-header">
         <a class="mobile-brand" href="/">UPINKING</a>
         <nav class="mobile-nav" aria-label="移动导航">
-          {nav.slice(1).map(([, label, href]) => <a href={href}>{label}</a>)}
+          {nav.slice(1).map(([, label, href]) => <a href={href} aria-current={isCurrent(href) ? 'page' : undefined}>{label}</a>)}
         </nav>
       </header>
       <main class="page" transition:name="page-content"><slot /></main>

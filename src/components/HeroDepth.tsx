@@ -132,18 +132,18 @@ export default function HeroDepth({ image, notes }: { image: string; notes: Note
         <div className="hero-scan" />
       </div>
       <div className="hero-copy">
-        <p className="hero-date">2026—09—03</p>
+        <p className="hero-date">LEARNING IN PUBLIC</p>
         <p className="hero-signal"><span /> SIGNAL FIELD / 03</p>
         <h1 id="hero-title" aria-label="构建、拆解、记录。">
           <span aria-hidden="true">构建、</span><span aria-hidden="true">拆解、</span><br />
           <span aria-hidden="true">记录</span><em aria-hidden="true">。</em>
         </h1>
-        <p className="hero-lead">我是 UPINKING，一名嵌入式工程师，<br />也持续研究软件工具、物理与设计。</p>
+        <p className="hero-lead">我是 UPINKING，喜欢计算机的大学生。<br />学习嵌入式，做软件，也记录新发现。</p>
         <a className="hero-cta" href="/articles">进入文章 <span aria-hidden="true">→</span></a>
         <p className="hero-coordinate">SOUTH CHINA · ONLINE</p>
       </div>
       <aside className="field-notes" aria-label="最新文章">
-        <div className="field-title">FIELD NOTES</div>
+        <div className="field-title">最新文章 / FIELD NOTES</div>
         {notes.map((note, index) => (
           <a className="field-note" href={note.href} key={note.href}>
             <span className="field-index">{String(index + 1).padStart(2, '0')}</span>

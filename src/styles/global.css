@@ -12,7 +12,7 @@
   --blue-soft: #9ac3ff;
   --orange: #ff8a1f;
   --line: rgba(143, 177, 218, 0.2);
-  --muted: #97a5b5;
+  --muted: #b0bccb;
   --serif: 'Noto Serif SC', 'Songti SC', serif;
   --sans: 'Inter Variable', 'PingFang SC', 'Microsoft YaHei', sans-serif;
 }
@@ -33,14 +33,14 @@ img { display: block; max-width: 100%; }
 .signal-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--orange); margin-top: 34px; box-shadow: 0 0 20px rgba(255,138,31,.45); }
 .rail-nav { margin: auto 0; width: 100%; }
 .rail-nav a { position: relative; display: grid; gap: 5px; padding: 17px 0 17px 33px; color: #aeb9c7; font-size: 14px; transition: color .2s ease, background .2s ease; }
-.rail-nav a span { font-size: 10px; color: #758396; }
+.rail-nav a span { font-size: .8125rem; color: #a5b4c6; }
 .rail-nav a:hover, .rail-nav a[aria-current='page'] { color: #fff; background: linear-gradient(90deg, rgba(255,138,31,.07), transparent); }
 .rail-nav a[aria-current='page']::before { content: ''; position: absolute; left: 32px; bottom: 9px; width: 24px; height: 2px; background: var(--orange); }
-.rail-motto { margin-bottom: 30px; color: #8290a1; font-family: var(--serif); font-size: 11px; line-height: 1.75; }
+.rail-motto { margin-bottom: 30px; color: #8290a1; font-family: var(--serif); font-size: .8125rem; line-height: 1.75; }
 .mobile-header { display: none; }
 .page { min-height: 100vh; }
 .page-frame { width: min(1180px, calc(100% - 72px)); margin: 0 auto; padding: 84px 0 100px; }
-.eyebrow { display: flex; align-items: center; gap: 12px; color: var(--blue-soft); font-size: 11px; letter-spacing: .16em; text-transform: uppercase; }
+.eyebrow { display: flex; align-items: center; gap: 12px; color: var(--blue-soft); font-size: .8125rem; letter-spacing: .16em; text-transform: uppercase; }
 .eyebrow::after { content: ''; width: 34px; height: 1px; background: currentColor; opacity: .7; }
 .display-title { margin: 18px 0 20px; font-family: var(--serif); font-size: clamp(44px, 6vw, 86px); line-height: 1.12; letter-spacing: -.035em; }
 .page-intro { max-width: 680px; color: #a9b4c2; line-height: 1.9; }
@@ -52,7 +52,7 @@ img { display: block; max-width: 100%; }
 .divider { border: 0; border-top: 1px solid var(--line); }
 .status { display: inline-flex; align-items: center; gap: 8px; color: #a9b4c2; font-size: 12px; }
 .status::before { content: ''; width: 7px; height: 7px; border-radius: 50%; background: #68d391; box-shadow: 0 0 14px rgba(104,211,145,.45); }
-.site-footer { border-top: 1px solid var(--line); padding: 32px 5vw; color: #7f8d9e; font-size: 12px; display: flex; justify-content: space-between; gap: 24px; }
+.site-footer { border-top: 1px solid var(--line); padding: 32px 5vw; color: #a5b4c6; font-size: 12px; display: flex; justify-content: space-between; gap: 24px; }
 
 ::view-transition-old(page-content) { animation: route-leave .32s cubic-bezier(.4,0,1,1) both; }
 ::view-transition-new(page-content) { animation: route-enter .62s cubic-bezier(.16,.76,.18,1) both; }
@@ -89,8 +89,9 @@ img { display: block; max-width: 100%; }
 }
 
 @media (max-width: 560px) {
-  .mobile-header { padding-inline: 14px; }
-  .mobile-nav { gap: 11px; font-size: 11px; }
+  .mobile-header { padding-inline: 12px; }
+  .mobile-nav { gap: 10px; font-size: .875rem; }
+  .mobile-brand { font-size: .875rem; letter-spacing: .06em; }
   .display-title { font-size: 42px; }
   .site-footer { flex-direction: column; }
 }
@@ -100,3 +101,9 @@ img { display: block; max-width: 100%; }
   [data-motion='ready'] { opacity: 1 !important; transform: none !important; filter: none !important; }
   ::view-transition-old(page-content), ::view-transition-new(page-content) { animation: none !important; }
 }
+
+/* Keep navigation usable on narrow screens and with larger text. */
+.mobile-nav a { min-height: 44px; display: inline-flex; align-items: center; }
+.mobile-nav a[aria-current='page'] { color: var(--orange); box-shadow: inset 0 -2px var(--orange); }
+@media (max-width: 360px) { .mobile-nav { gap: 8px; } .mobile-brand { font-size: .8125rem; letter-spacing: 0; } }
+@media (max-width: 900px) { html { scroll-padding-top: 80px; } }
