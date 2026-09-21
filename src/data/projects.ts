@@ -28,6 +28,15 @@ export const projectSnapshot: Project[] = [
     featured: true,
   },
   {
+    name: 'codemap',
+    description: '用 Rust 构建的桌面代码地图，将目录与文件绘成可缩放的视图，通过拖拽、缩放和语言配色探索代码库。',
+    language: 'Rust',
+    url: 'https://github.com/upinking/codemap',
+    stars: 0,
+    updatedAt: '2026-09-21T17:22:13+08:00',
+    featured: true,
+  },
+  {
     name: 'upblog-test',
     description: 'UPINKING 个人博客的早期实验版本，也是这次重构的起点。',
     language: 'JavaScript',

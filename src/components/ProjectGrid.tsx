@@ -61,6 +61,13 @@ export default function ProjectGrid({ fallback }: { fallback: Project[] }) {
       steps: ['选中文字', '按 Alt + D', '查看流式翻译'],
       features: ['快捷键可自定义', '适配多显示器与屏幕边缘', '点击结果即可复制'],
     },
+    codemap: {
+      title: '把代码库展开成一张地图。',
+      description: '一个 Rust 桌面代码浏览实验。将目录和文件放进可缩放的地图中，用不同颜色区分语言，从整体结构逐步放大到代码细节。',
+      platform: '桌面工具 · Rust / wgpu',
+      steps: ['指定本地代码目录', '拖拽与缩放地图', '放大查看文件代码'],
+      features: ['按目录组织文件布局', '按编程语言区分颜色', '支持导出 PNG 地图'],
+    },
     'upblog-test': {
       title: '把学习和动手做的过程留下来。',
       description: '你正在浏览的个人网站。用 Markdown 整理文章，展示公开项目，也把小工具放进实验室，持续完善自己的学习空间。',

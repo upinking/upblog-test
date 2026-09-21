@@ -18,7 +18,7 @@ describe('project data', () => {
   it('rejects malformed remote data and falls back per project', () => {
     expect(normalizeGitHubProject({ name: 42 })).toBeNull()
     const merged = mergeProjects([{ ...projectSnapshot[0], stars: 99 }])
-    expect(merged).toHaveLength(3)
+    expect(merged).toHaveLength(projectSnapshot.length)
     expect(merged[0].stars).toBe(99)
     expect(merged[1]).toEqual(projectSnapshot[1])
   })
