@@ -138,7 +138,7 @@ export default function HeroDepth({ image, notes }: { image: string; notes: Note
           <span aria-hidden="true">构建、</span><span aria-hidden="true">拆解、</span><br />
           <span aria-hidden="true">记录</span><em aria-hidden="true">。</em>
         </h1>
-        <p className="hero-lead">我是 UPINKING，喜欢计算机的大学生。<br />学习嵌入式，做软件，也记录新发现。</p>
+        <p className="hero-lead">我是 UPINKING，一名物理系大学生。<br />学习物理，探索嵌入式，也动手做软件。</p>
         <a className="hero-cta" href="/articles">进入文章 <span aria-hidden="true">→</span></a>
         <p className="hero-coordinate">SOUTH CHINA · ONLINE</p>
       </div>
